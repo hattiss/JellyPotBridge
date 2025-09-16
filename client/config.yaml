@@ -1,0 +1,7 @@
+reporting-interval: 10s
+pot-player-path: string
+jellyfin:
+  server-url: http://127.0.0.1:8096
+  username: string
+  password: string
+  device-id: f7c8a374-365a-4545-94ed-94410338f495

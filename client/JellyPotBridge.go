@@ -151,15 +151,9 @@ func getPotPlayerInfo() (*PotPlayerInfo, error) {
 	}
 
 	// Get playback status
-	status, _, err := sendMessage.Call(hWnd, uintptr(WmUser), uintptr(PotGetPlayStatus), 0)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get playback status: %w", err)
-	}
+	status, _, _ := sendMessage.Call(hWnd, uintptr(WmUser), uintptr(PotGetPlayStatus), 0)
 	// Get current playback time in milliseconds
-	milliseconds, _, err := sendMessage.Call(hWnd, uintptr(WmUser), uintptr(PotGetCurrentTime), 0)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get current playback time: %w", err)
-	}
+	milliseconds, _, _ := sendMessage.Call(hWnd, uintptr(WmUser), uintptr(PotGetCurrentTime), 0)
 	seconds := float64(milliseconds) / 1000.0
 	ticks := int64(milliseconds) * TicksPerMillisecond
 	eventName := getEventName(int(status))
@@ -678,12 +672,13 @@ func main() {
 				ItemId:                 itemId,
 				EventName:              info.EventName,
 			}
-
-			if err := jellyPotClient.UpdatePlaybackStatus(event); err != nil {
-				fmt.Printf("Failed to send status update: %v\n", err)
-			} else {
-				fmt.Printf("Status updated: %s, Position: %d ticks\n",
-					event.EventName, event.PositionTicks)
+			if event.PositionTicks > TicksPerMillisecond*60000 {
+				if err := jellyPotClient.UpdatePlaybackStatus(event); err != nil {
+					fmt.Printf("Failed to send status update: %v\n", err)
+				} else {
+					fmt.Printf("Status updated: %s, Position: %d ticks\n",
+						event.EventName, event.PositionTicks)
+				}
 			}
 		}
 	}
